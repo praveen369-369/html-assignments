@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0F1B2D;
+      --card:   #162233;
+      --white:  #F7F9FC;
+      --slate:  #E2E8F0;
+      --muted:  #7A8A9E;
+      --teal:   #00C9B1;
+      --teal-dim: rgba(0,201,177,.15);
+      --amber:  #F5A623;
+      --error:  #FF5A5F;
+      --radius: 12px;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--white);
+    }
+
+    /* ── Layout Shell ── */
+    .shell {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      max-width: 860px;
+      width: 100%;
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,.45);
+    }
+
+    /* ── Sidebar / Progress ── */
+    .sidebar {
+      background: linear-gradient(180deg, #0d2240 0%, #0a1a2e 100%);
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-right: 1px solid rgba(255,255,255,.06);
+    }
+
+    .sidebar-title {
+      font-family: 'Sora', sans-serif;
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 2rem;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      padding: .9rem 0;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 13px;
+      top: 2.4rem;
+      width: 2px;
+      height: calc(100% - 1rem);
+      background: rgba(255,255,255,.08);
+    }
+
+    .step.active .step-dot { background: var(--teal); box-shadow: 0 0 0 4px var(--teal-dim); }
+    .step.done   .step-dot { background: var(--teal); }
+
+    .step-dot {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--muted);
+      transition: background .3s, box-shadow .3s;
+    }
+
+    .step.active .step-dot,
+    .step.done   .step-dot { color: var(--navy); }
+
+    .step-label { padding-top: 4px; }
+
+    .step-label strong {
+      display: block;
+      font-family: 'Sora', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .step.inactive .step-label strong { color: var(--muted); }
+
+    .step-label span {
+      font-size: .7rem;
+      color: var(--muted);
+    }
+
+    /* ── Main Form Area ── */
+    .main { padding: 2.5rem 2.5rem 2rem; overflow-y: auto; }
+
+    .form-header { margin-bottom: 2rem; }
+
+    .form-header h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+    }
+
+    .form-header h1 span { color: var(--teal); }
+
+    .form-header p {
+      margin-top: .4rem;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    /* ── Section Dividers ── */
+    .section-label {
+      font-family: 'Sora', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin: 1.8rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,.07);
+    }
+
+    /* ── Field Groups ── */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--slate);
+    }
+
+    label .req {
+      color: var(--teal);
+      margin-left: 2px;
+    }
+
+    label .hint {
+      font-size: .7rem;
+      color: var(--muted);
+      font-weight: 400;
+      margin-left: .4rem;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="url"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="file"] {
+      background: rgba(255,255,255,.04);
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: .65rem .85rem;
+      font-family: 'Inter', sans-serif;
+      font-size: .875rem;
+      color: var(--white);
+      outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      width: 100%;
+    }
+
+    input::placeholder { color: var(--muted); }
+
+    input:focus {
+      border-color: var(--teal);
+      background: var(--teal-dim);
+      box-shadow: 0 0 0 3px rgba(0,201,177,.12);
+    }
+
+    input:invalid:not(:placeholder-shown) { border-color: var(--error); }
+
+    input[type="date"],
+    input[type="datetime-local"] { color-scheme: dark; }
+
+    input[type="file"] { padding: .5rem .85rem; cursor: pointer; }
+
+    input[type="file"]::file-selector-button {
+      background: var(--teal);
+      color: var(--navy);
+      border: none;
+      border-radius: 5px;
+      padding: .3rem .75rem;
+      font-family: 'Sora', sans-serif;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: .75rem;
+    }
+
+    /* ── Radio & Checkbox ── */
+    .choice-group { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+    .choice-item { position: relative; }
+
+    .choice-item input[type="radio"],
+    .choice-item input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .choice-item label {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .45rem .9rem;
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      font-size: .8rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      user-select: none;
+    }
+
+    .choice-item label::before {
+      content: '';
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid var(--muted);
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+
+    .choice-item input[type="checkbox"] + label::before { border-radius: 4px; }
+
+    .choice-item input:checked + label {
+      border-color: var(--teal);
+      color: var(--white);
+      background: var(--teal-dim);
+    }
+
+    .choice-item input:checked + label::before {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    /* ── Range Slider ── */
+    .range-wrapper { display: flex; align-items: center; gap: .75rem; }
+
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.1);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-dim);
+      cursor: pointer;
+    }
+
+    .range-value {
+      font-family: 'Sora', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--teal);
+      min-width: 2.5rem;
+      text-align: right;
+    }
+
+    /* ── Color Picker ── */
+    .color-row { display: flex; align-items: center; gap: 1rem; }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      width: 44px;
+      height: 44px;
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: 2px;
+      background: rgba(255,255,255,.04);
+      cursor: pointer;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 6px; }
+    input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
+
+    .color-label-inline { font-size: .8rem; color: var(--muted); }
+
+    .color-preview {
+      font-size: .75rem;
+      color: var(--muted);
+      font-family: 'Sora', sans-serif;
+      letter-spacing: .05em;
+    }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      gap: .75rem;
+      margin-top: 2rem;
+      align-items: center;
+    }
+
+    .btn-submit {
+      flex: 1;
+      background: var(--teal);
+      color: var(--navy);
+      border: none;
+      border-radius: 8px;
+      padding: .8rem 1.5rem;
+      font-family: 'Sora', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .03em;
+      transition: opacity .2s, transform .1s;
+    }
+
+    .btn-submit:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
+
+    .btn-reset {
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: .8rem 1.25rem;
+      font-family: 'Sora', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+
+    .btn-reset:hover { border-color: var(--error); color: var(--error); }
+
+    /* ── Success Banner ── */
+    .success-banner {
+      display: none;
+      background: var(--teal-dim);
+      border: 1.5px solid var(--teal);
+      border-radius: 8px;
+      padding: .85rem 1rem;
+      font-size: .85rem;
+      color: var(--teal);
+      margin-top: 1rem;
+      font-family: 'Sora', sans-serif;
+      text-align: center;
+    }
+
+    /* ── Inline vs Block demo note ── */
+    .inline-demo {
+      background: rgba(245,166,35,.07);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 6px 6px 0;
+      padding: .6rem .9rem;
+      font-size: .78rem;
+      color: #c9a060;
+      margin-top: .5rem;
+      line-height: 1.5;
+    }
+
+    .inline-demo strong { color: var(--amber); }
+    .inline-demo code {
+      font-size: .72rem;
+      background: rgba(255,255,255,.06);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { padding: 1.75rem 1.25rem; }
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <p class="sidebar-title">Progress</p>
+
+    <div class="step active">
+      <div class="step-dot">1</div>
+      <div class="step-label">
+        <strong>Identity</strong>
+        <span>Name &amp; security</span>
+      </div>
+    </div>
+    <div class="step inactive">
+      <div class="step-dot">2</div>
+      <div class="step-label">
+        <strong>Contact</strong>
+        <span>Email &amp; phone</span>
+      </div>
+    </div>
+    <div class="step inactive">
+      <div class="step-dot">3</div>
+      <div class="step-label">
+        <strong>Schedule</strong>
+        <span>Dates &amp; times</span>
+      </div>
+    </div>
+    <div class="step inactive">
+      <div class="step-dot">4</div>
+      <div class="step-label">
+        <strong>Preferences</strong>
+        <span>Role &amp; settings</span>
+      </div>
+    </div>
+    <div class="step inactive">
+      <div class="step-dot">5</div>
+      <div class="step-label">
+        <strong>Finish</strong>
+        <span>Review &amp; submit</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="form-header">
+      <h1>Create your <span>profile.</span></h1>
+      <p>All fields marked <strong style="color:var(--teal)">✦</strong> are required.</p>
+    </div>
+
+    <form id="profileForm" novalidate>
+
+      <!-- Section 1: Identity -->
+      <p class="section-label">Identity</p>
+
+      <div class="row">
+        <div class="field">
+          <label for="fullname">Full Name <span class="req">✦</span></label>
+          <input type="text" id="fullname" name="fullname"
+            placeholder="e.g. Alex Rivera" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="password">Password <span class="req">✦</span></label>
+          <input type="password" id="password" name="password"
+            placeholder="Min. 8 characters" required minlength="8" />
+        </div>
+      </div>
+
+      <div class="inline-demo">
+        <strong>Block vs Inline:</strong> This note is a <code>&lt;div&gt;</code> (block — starts on a new line, full width).
+        The <strong>"Full Name"</strong> and <strong>"Password"</strong> labels contain
+        <code>&lt;span class="req"&gt;</code> elements that are <strong>inline</strong> — they flow
+        within the label text without breaking to a new line.
+      </div>
+
+      <!-- Section 2: Contact -->
+      <p class="section-label">Contact</p>
+
+      <div class="row">
+        <div class="field">
+          <label for="email">Email Address <span class="req">✦</span></label>
+          <input type="email" id="email" name="email"
+            placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="phone">Phone Number <span class="req">✦</span></label>
+          <input type="tel" id="phone" name="phone"
+            placeholder="+1 (555) 000-0000" required
+            pattern="[\+]?[0-9\s\-\(\)]{7,15}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="website">Portfolio / Website <span class="hint">(optional)</span></label>
+        <input type="url" id="website" name="website"
+          placeholder="https://yoursite.com" />
+      </div>
+
+      <!-- Section 3: Schedule -->
+      <p class="section-label">Schedule</p>
+
+      <div class="row">
+        <div class="field">
+          <label for="startdate">Available From <span class="req">✦</span></label>
+          <input type="date" id="startdate" name="startdate" required />
+        </div>
+        <div class="field">
+          <label for="kickoff">Kickoff Meeting <span class="req">✦</span></label>
+          <input type="datetime-local" id="kickoff" name="kickoff" required />
+        </div>
+      </div>
+
+      <!-- Section 4: Preferences -->
+      <p class="section-label">Preferences</p>
+
+      <div class="field">
+        <label>Primary Role <span class="req">✦</span></label>
+        <div class="choice-group">
+          <div class="choice-item">
+            <input type="radio" id="role-design" name="role" value="design" required />
+            <label for="role-design">Design</label>
+          </div>
+          <div class="choice-item">
+            <input type="radio" id="role-eng" name="role" value="engineering" />
+            <label for="role-eng">Engineering</label>
+          </div>
+          <div class="choice-item">
+            <input type="radio" id="role-product" name="role" value="product" />
+            <label for="role-product">Product</label>
+          </div>
+          <div class="choice-item">
+            <input type="radio" id="role-other" name="role" value="other" />
+            <label for="role-other">Other</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Interests <span class="hint">(pick any)</span></label>
+        <div class="choice-group">
+          <div class="choice-item">
+            <input type="checkbox" id="int-ux" name="interests" value="ux" />
+            <label for="int-ux">UX Research</label>
+          </div>
+          <div class="choice-item">
+            <input type="checkbox" id="int-ai" name="interests" value="ai" />
+            <label for="int-ai">AI &amp; ML</label>
+          </div>
+          <div class="choice-item">
+            <input type="checkbox" id="int-open" name="interests" value="open-source" />
+            <label for="int-open">Open Source</label>
+          </div>
+          <div class="choice-item">
+            <input type="checkbox" id="int-data" name="interests" value="data" />
+            <label for="int-data">Data Viz</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="experience">
+          Experience Level
+          <span class="hint">— drag to set</span>
+        </label>
+        <div class="range-wrapper">
+          <span style="font-size:.7rem;color:var(--muted)">Beginner</span>
+          <input type="range" id="experience" name="experience"
+            min="0" max="10" value="5" />
+          <span style="font-size:.7rem;color:var(--muted)">Expert</span>
+          <span class="range-value" id="rangeVal">5</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="accentColor">Profile Accent Color</label>
+        <div class="color-row">
+          <input type="color" id="accentColor" name="accentColor" value="#00C9B1" />
+          <span class="color-label-inline">Personalises your dashboard theme.</span>
+          <span class="color-preview" id="colorHex">#00C9B1</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="avatar">Profile Photo <span class="hint">(JPG or PNG, max 2 MB)</span></label>
+        <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png" />
+      </div>
+
+      <!-- Buttons -->
+      <div class="btn-row">
+        <button type="reset" class="btn-reset">Reset form</button>
+        <button type="submit" class="btn-submit">Create profile →</button>
+      </div>
+
+      <div class="success-banner" id="successBanner">
+        ✓ Profile created successfully! Welcome aboard.
+      </div>
+
+    </form>
+  </main>
+</div>
+
+<script>
+  // Live range display
+  const rangeInput = document.getElementById('experience');
+  const rangeVal   = document.getElementById('rangeVal');
+  rangeInput.addEventListener('input', () => {
+    rangeVal.textContent = rangeInput.value;
+  });
+
+  // Live color hex display
+  const colorInput = document.getElementById('accentColor');
+  const colorHex   = document.getElementById('colorHex');
+  colorInput.addEventListener('input', () => {
+    colorHex.textContent = colorInput.value.toUpperCase();
+  });
+
+  // Form submit with validation
+  const form   = document.getElementById('profileForm');
+  const banner = document.getElementById('successBanner');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const roleSelected = form.querySelector('input[name="role"]:checked');
+    if (!roleSelected) {
+      form.querySelector('#role-design').setCustomValidity('Please select a role.');
+    } else {
+      form.querySelectorAll('input[name="role"]').forEach(r => r.setCustomValidity(''));
+    }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    banner.style.display = 'block';
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    document.querySelectorAll('.step').forEach((step, i) => {
+      setTimeout(() => {
+        step.classList.remove('inactive', 'active');
+        step.classList.add('done');
+        step.querySelector('.step-dot').textContent = '✓';
+      }, i * 160);
+    });
+  });
+
+  // Reset
+  form.addEventListener('reset', () => {
+    banner.style.display = 'none';
+    document.querySelectorAll('.step').forEach((step, i) => {
+      step.classList.remove('done', 'active', 'inactive');
+      step.classList.add(i === 0 ? 'active' : 'inactive');
+      step.querySelector('.step-dot').textContent = i + 1;
+    });
+    rangeVal.textContent = '5';
+    colorHex.textContent = '#00C9B1';
+  });
+</script>
+</body>
+</html>
